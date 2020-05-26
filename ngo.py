@@ -142,9 +142,7 @@ class NGOManager(object):
         last_page_no = self.get_last_page_no()
         try:
             for page in range(int(self.conf["START_PAGE"]), last_page_no+1):
-                if page == 2:
-                    break
-
+                # if page == 2: break
                 url = NGOManager.site_url.format(page)
                 log.info("Getting info from: {}".format(url))
                 scraper = NGOScraper(self.chrome, url, self.conf)
@@ -194,12 +192,6 @@ def main():
     end = dt.now().strftime("%d-%m-%Y %H:%M:%S %p")
     log.info("Last successful page extract: {}".format(manager.last_successful_scrape))
     log.info("Script ends at: {}".format(end))
-
-
-def test():
-    conf = get_conf()
-    chrome = webdriver.Chrome(conf["CHROME_DRIVER_PATH"])
-    chrome.close()
 
 
 if __name__ == '__main__':
