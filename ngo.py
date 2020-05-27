@@ -141,6 +141,13 @@ class NGOManager(object):
     def read(self):
         last_page_no = self.get_last_page_no()
         try:
+            if int(self.conf["END_PAGE"]) >= 0:
+                log.info("Taking END_PAGE as a input from conf file. Overriding the actual last page.")
+                if int(self.conf["START_PAGE"]) > int(self.conf["END_PAGE"]):
+                    log.error("START_PAGE should be lesser than END_PAGE. Please configure conf file properly!")
+                    exit(1)
+
+                last_page_no = int(self.conf["END_PAGE"])
             for page in range(int(self.conf["START_PAGE"]), last_page_no+1):
                 # if page == 2: break
                 url = NGOManager.site_url.format(page)
@@ -150,13 +157,14 @@ class NGOManager(object):
                 self.data.extend(data)
                 self.last_successful_scrape = page
         except Exception as err:
-            log.error("Something error happened: {}".format(err))
+            log.error("Some error happened: {}".format(err))
         finally:
             return self
 
     def save(self):
         df = pd.DataFrame(self.data)
         df.to_excel(NGOManager.output_xlsx, index=False)
+        log.info("Fetched data has been stored in {} file".format(NGOManager.output_xlsx))
 
     @classmethod
     def cleanup(cls):
